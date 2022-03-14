@@ -13,6 +13,7 @@ import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
 import 'package:ar_flutter_plugin/managers/ar_object_manager.dart';
 import 'package:ar_flutter_plugin/managers/ar_session_manager.dart';
 import 'package:ar_flutter_plugin/models/ar_hittest_result.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:confetti/confetti.dart';
 import 'package:provider/provider.dart';
 import 'package:slide_puzzle/src/value_tab_controller.dart';
@@ -96,10 +97,11 @@ class _PuzzleControls extends ChangeNotifier implements PuzzleControls {
     assert(_parent._puzzleConfigListenable.started);
     assert(_parent.puzzle.solved);
     _parent._confettiController.play();
+    await _parent._audioPlayer.play('winsound.mp3');
     await Future.delayed(const Duration(seconds: 5));
     await _parent.puzzle.removeNodes(_parent);
-    reset();
     _parent._puzzleConfigListenable.end();
+    reset();
   }
 
   @override
@@ -126,7 +128,7 @@ class PuzzleHomeState extends State
   late _PuzzleControls _autoPlayListenable;
 
   late _PuzzleConfig _puzzleConfigListenable;
-
+  late AudioCache _audioPlayer;
   @override
   late final ARObjectManager arObjectManager;
   @override
@@ -173,6 +175,7 @@ class PuzzleHomeState extends State
     onARViewCreated = arCreate;
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 5));
+    _audioPlayer = AudioCache();
     super.initState();
   }
 
@@ -188,7 +191,7 @@ class PuzzleHomeState extends State
     this.arSessionManager.onInitialize(
           showFeaturePoints: false,
           showPlanes: true,
-          showWorldOrigin: true,
+          showWorldOrigin: false,
           handleTaps: true,
           handlePans: true,
           handleRotation: true,
@@ -441,14 +444,6 @@ Widget _doBuildCore(bool small) => ValueTabController<SharedTheme>(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text('Change Element Size',
-                                            style: _infoStyle),
-                                        Slider(
-                                            label: 'Change Size',
-                                            value: puzzleConfig.scale,
-                                            onChanged: (value) {
-                                              puzzleConfig.updateScale(value);
-                                            }),
                                         Text(
                                           'Change Distance ',
                                           style: _infoStyle,

@@ -27,7 +27,8 @@ class PuzzleAnimator implements PuzzleProxy {
   double _zValue;
   Matrix4 get planeHitMatrix => _planeHitMatrix;
   List<Body> get locations => _locations;
-  static const String baseUrl = 'http://192.168.1.9:8000/';
+  static const String baseUrl =
+      'https://github.com/ramyak-mehra/ar_slide_puzzle/raw/master/ducks/';
   bool _stable = true;
 
   bool get stable => _stable;
@@ -105,7 +106,7 @@ class PuzzleAnimator implements PuzzleProxy {
           type: NodeType.webGLB,
           name: '$name',
           uri: '${baseUrl}duck_$name.glb',
-          scale: Vector3(0.2, 0.2, 0.2),
+          scale: Vector3(0.3, 0.3, 0.3),
           position: Vector3(0, 0, 0),
           rotation: Vector4(0.0, 1.0, 0.0, -89.9));
 
@@ -265,7 +266,9 @@ class PuzzleAnimator implements PuzzleProxy {
 
   void changeScale(double scale) {
     for (var body in _locations) {
+      final rotation = body.node.rotation;
       body.node.scale = Vector3(scale, scale, scale);
+      body.node.rotationFromQuaternion = Quaternion(0.0, 0.0, 1.0, 40);
     }
   }
 
